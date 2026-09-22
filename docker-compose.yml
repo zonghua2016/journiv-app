@@ -156,7 +156,7 @@ services:
     <<: *app-common
     container_name: journiv-postgres-app
     ports:
-      - "${APP_PORT:-8000}:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       <<: *base-env
       SERVICE_ROLE: app
@@ -173,8 +173,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.0"
-          memory: 2g
+          cpus: "1.0"
+          memory: 768m
         reservations:
           memory: 512m
 

@@ -24,6 +24,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Use Aliyun mirror for faster apt downloads in China
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list 2>/dev/null || true
+
 # Install build dependencies (includes ffmpeg and HEIF support)
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
@@ -62,6 +65,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
   LEGACY_WEB_BUILD_PATH=/opt/journiv/legacy-web
 
 WORKDIR /app
+
+# Use Aliyun mirror for faster apt downloads in China
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list 2>/dev/null || true
 
 # Install runtime dependencies and verify ffmpeg license
 RUN apt-get update && apt-get install -y --no-install-recommends \
