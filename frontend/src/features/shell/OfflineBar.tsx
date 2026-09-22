@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
+import { enUS, zhCN } from "date-fns/locale";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const RELATIVE_TIME_REFRESH_MS = 60_000;
 
@@ -11,6 +13,7 @@ const RELATIVE_TIME_REFRESH_MS = 60_000;
  * so nothing here is mistaken for live data.
  */
 export function OfflineBar() {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -27,15 +30,20 @@ export function OfflineBar() {
       .getAll()
       .map((query) => query.state.dataUpdatedAt),
   );
+  const since =
+    mostRecentSync > 0
+      ? t("shell.syncedFrom", {
+          distance: formatDistance(mostRecentSync, now, {
+            addSuffix: true,
+            locale: i18n.resolvedLanguage === "en-US" ? enUS : zhCN,
+          }),
+        })
+      : "";
 
   return (
     <div className="jv-offline-bar" role="status">
       <span className="text-sm text-foreground">
-        You&rsquo;re offline. Showing cached content
-        {mostRecentSync > 0
-          ? ` from ${formatDistance(mostRecentSync, now, { addSuffix: true })}`
-          : ""}
-        . New entries and edits are unavailable until you&rsquo;re back online.
+        {t("shell.offline", { since })}
       </span>
     </div>
   );

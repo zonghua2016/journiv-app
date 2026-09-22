@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sessionStore, userIdFromAuthResponse } from "../../api/auth/session";
 import { api } from "../../api/client/api";
 import { instanceConfigQuery } from "../../api/query/options";
@@ -15,6 +16,7 @@ import { OidcAction } from "./oidc";
 import "./auth.css";
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +49,7 @@ export function LoginPage() {
       });
       await navigate({ href: returnTo });
     } catch {
-      setError("Sign in failed. Check your email and password.");
+      setError(t("auth.signInFailed"));
     } finally {
       submitting.current = false;
       setPending(false);
@@ -57,12 +59,12 @@ export function LoginPage() {
   if (instanceConfig.isLoading) {
     return (
       <AuthCard
-        heading="Checking sign-in options"
+        heading={t("auth.checkingOptions")}
         busy
         lede={
           <p className="jv-auth__lede jv-auth__status" role="status">
             <Spinner aria-hidden />
-            Checking how this Journiv instance accepts sign-ins…
+            {t("auth.checkingOptionsDetail")}
           </p>
         }
       />
@@ -72,11 +74,11 @@ export function LoginPage() {
   if (!instanceConfig.data) {
     return (
       <AuthCard
-        heading="Sign in unavailable"
-        lede="Journiv couldn’t check the sign-in methods available on this instance."
+        heading={t("auth.unavailable")}
+        lede={t("auth.unavailableDetail")}
       >
         <Button variant="default" onClick={() => void instanceConfig.refetch()}>
-          Try again
+          {t("common.retry")}
         </Button>
       </AuthCard>
     );
@@ -86,24 +88,18 @@ export function LoginPage() {
 
   if (oidc_only) {
     return (
-      <AuthCard
-        heading="Welcome back"
-        lede="This Journiv instance uses single sign-on. Continue with your identity provider to access your journal."
-      >
+      <AuthCard heading={t("auth.welcomeBack")} lede={t("auth.ssoLede")}>
         <OidcAction returnTo={returnTo} primary />
       </AuthCard>
     );
   }
 
   return (
-    <AuthCard
-      heading="Welcome back"
-      lede="Sign in to continue to your journal."
-    >
+    <AuthCard heading={t("auth.welcomeBack")} lede={t("auth.signInLede")}>
       <form className="jv-auth__form" action={submit}>
         <FieldGroup className="jv-auth__fields">
           <Field>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t("auth.email")}</FieldLabel>
             <Input
               id="email"
               required
@@ -116,7 +112,7 @@ export function LoginPage() {
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
             <Input
               id="password"
               required
@@ -135,7 +131,7 @@ export function LoginPage() {
         )}
         <Button type="submit" variant="default" disabled={pending}>
           {pending && <Spinner data-icon="inline-start" aria-hidden />}
-          {pending ? "Signing in…" : "Sign in"}
+          {pending ? t("auth.signingIn") : t("auth.signIn")}
         </Button>
       </form>
 
@@ -143,7 +139,7 @@ export function LoginPage() {
         <>
           <div className="jv-auth__divider">
             <Separator aria-hidden="true" />
-            <span className="jv-caption">or</span>
+            <span className="jv-caption">{t("common.or")}</span>
             <Separator aria-hidden="true" />
           </div>
           <OidcAction returnTo={returnTo} />
@@ -152,9 +148,9 @@ export function LoginPage() {
 
       {!disable_signup && (
         <p className="jv-auth__alternate jv-caption">
-          New to Journiv?{" "}
+          {t("auth.newToJourniv")}{" "}
           <Link to="/signup" search={{ returnTo }}>
-            Create an account
+            {t("auth.createAccount")}
           </Link>
         </p>
       )}

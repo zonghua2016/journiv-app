@@ -2,6 +2,7 @@ import { apiBaseUrl } from "../../api/client/baseUrl";
 import { buttonVariants } from "../../components/ui/button";
 import { cx } from "../../lib/cx";
 import { safeReturnTo } from "./returnTo";
+import { useTranslation } from "react-i18next";
 
 const returnToKey = "journiv.auth.oidc-return-to.v1";
 
@@ -42,6 +43,7 @@ export function OidcAction({
   returnTo: string;
   primary?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <a
       className={cx(
@@ -51,7 +53,7 @@ export function OidcAction({
       href={oidcLoginHref()}
       onClick={() => oidcReturnToStore.write(returnTo)}
     >
-      Continue with single sign-on
+      {t("auth.continueSso")}
     </a>
   );
 }

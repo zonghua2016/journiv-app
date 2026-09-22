@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearch } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import type { MomentFilters } from "../../api/query/keys";
 import {
   activitiesQuery,
@@ -85,6 +86,7 @@ export function scopeSearchFrom(search: ScopeSearch): ScopeSearch {
 }
 
 export function useMomentScope(): MomentScope {
+  const { t } = useTranslation();
   const params = useParams({ strict: false }) as { journalId?: string };
   const search = useSearch({ strict: false }) as ScopeSearch;
 
@@ -132,11 +134,11 @@ export function useMomentScope(): MomentScope {
     return {
       kind,
       filters: {},
-      title: "All journals",
+      title: t("nav.allJournals"),
       glyph: null,
-      searchLabel: "Search all moments",
-      emptyTitle: "No moments yet",
-      emptyDescription: "Your timeline will fill up as you write.",
+      searchLabel: t("timeline.searchAll"),
+      emptyTitle: t("timeline.noMoments"),
+      emptyDescription: t("timeline.noMomentsDescription"),
       isResolving: false,
       isError: false,
       refetch: () => undefined,
@@ -145,7 +147,7 @@ export function useMomentScope(): MomentScope {
 
   if (kind === "journal") {
     const journal = journals.data?.find((item) => item.id === id);
-    const title = journal?.title ?? "Journal";
+    const title = journal?.title ?? t("timeline.journalFallback");
     return {
       kind,
       id,
@@ -155,9 +157,9 @@ export function useMomentScope(): MomentScope {
         journal && (journal.color || journal.icon) ? (
           <JournalDot journal={journal} className="jv-list-header__dot" />
         ) : null,
-      searchLabel: `Search ${title}`,
-      emptyTitle: "No moments yet",
-      emptyDescription: "Entries you write in this journal will appear here.",
+      searchLabel: t("timeline.searchJournal", { title }),
+      emptyTitle: t("timeline.noMoments"),
+      emptyDescription: t("timeline.journalEmptyDescription"),
       isResolving,
       isError,
       refetch: () => void journals.refetch(),
@@ -166,7 +168,7 @@ export function useMomentScope(): MomentScope {
 
   if (kind === "person") {
     const person = people.data?.find((item) => item.id === id);
-    const title = person?.name ?? "Person";
+    const title = person?.name ?? t("timeline.personFallback");
     const initial = title.trim().charAt(0).toUpperCase() || "?";
     return {
       kind,
@@ -181,9 +183,9 @@ export function useMomentScope(): MomentScope {
           <AvatarFallback>{initial}</AvatarFallback>
         </Avatar>
       ),
-      searchLabel: `Search moments with ${title}`,
-      emptyTitle: `No moments with ${title} yet`,
-      emptyDescription: "Moments where you note this person will appear here.",
+      searchLabel: t("timeline.searchWithPerson", { title }),
+      emptyTitle: t("timeline.noMomentsWith", { title }),
+      emptyDescription: t("timeline.personEmptyDescription"),
       isResolving,
       isError,
       refetch: () => void people.refetch(),
@@ -192,16 +194,16 @@ export function useMomentScope(): MomentScope {
 
   if (kind === "tag") {
     const tag = tags.data?.find((item) => item.id === id);
-    const title = tag ? `#${tag.name}` : "Tag";
+    const title = tag ? `#${tag.name}` : t("timeline.tagFallback");
     return {
       kind,
       id,
       filters: { tag_id: id },
       title,
       glyph: null,
-      searchLabel: `Search ${title} moments`,
-      emptyTitle: `No ${title} moments yet`,
-      emptyDescription: "Moments you give this tag will appear here.",
+      searchLabel: t("timeline.searchEntity", { title }),
+      emptyTitle: t("timeline.noEntityMoments", { title }),
+      emptyDescription: t("timeline.tagEmptyDescription"),
       isResolving,
       isError,
       refetch: () => void tags.refetch(),
@@ -210,7 +212,7 @@ export function useMomentScope(): MomentScope {
 
   if (kind === "activity") {
     const activity = activities.data?.find((item) => item.id === id);
-    const title = activity?.name ?? "Activity";
+    const title = activity?.name ?? t("timeline.activityFallback");
     return {
       kind,
       id,
@@ -219,9 +221,9 @@ export function useMomentScope(): MomentScope {
       glyph: activity ? (
         <EntityGlyph color={activity.color} icon={activity.icon} size={16} />
       ) : null,
-      searchLabel: `Search ${title} moments`,
-      emptyTitle: `No ${title} moments yet`,
-      emptyDescription: "Moments logging this activity will appear here.",
+      searchLabel: t("timeline.searchEntity", { title }),
+      emptyTitle: t("timeline.noEntityMoments", { title }),
+      emptyDescription: t("timeline.activityEmptyDescription"),
       isResolving,
       isError,
       refetch: () => void activities.refetch(),
@@ -230,7 +232,7 @@ export function useMomentScope(): MomentScope {
 
   if (kind === "mood") {
     const mood = moods.data?.find((item) => item.id === id);
-    const title = mood?.name ?? "Mood";
+    const title = mood?.name ?? t("timeline.moodFallback");
     return {
       kind,
       id,
@@ -239,9 +241,9 @@ export function useMomentScope(): MomentScope {
       glyph: mood ? (
         <EntityGlyph colorValue={mood.color_value} size={16} />
       ) : null,
-      searchLabel: `Search ${title} moments`,
-      emptyTitle: `No ${title} moments yet`,
-      emptyDescription: "Moments with this mood will appear here.",
+      searchLabel: t("timeline.searchEntity", { title }),
+      emptyTitle: t("timeline.noEntityMoments", { title }),
+      emptyDescription: t("timeline.moodEmptyDescription"),
       isResolving,
       isError,
       refetch: () => void moods.refetch(),
@@ -250,7 +252,7 @@ export function useMomentScope(): MomentScope {
 
   // goal
   const goal = goals.data?.find((item) => item.id === id);
-  const title = goal?.title ?? "Goal";
+  const title = goal?.title ?? t("timeline.goalFallback");
   return {
     kind: "goal",
     id,
@@ -259,10 +261,9 @@ export function useMomentScope(): MomentScope {
     glyph: goal ? (
       <EntityGlyph colorValue={goal.color_value} icon={goal.icon} size={16} />
     ) : null,
-    searchLabel: `Search moments for ${title}`,
-    emptyTitle: `No moments for ${title} yet`,
-    emptyDescription:
-      "Moments a completed period of this goal is logged against will appear here.",
+    searchLabel: t("timeline.searchGoal", { title }),
+    emptyTitle: t("timeline.noGoalMoments", { title }),
+    emptyDescription: t("timeline.goalEmptyDescription"),
     isResolving,
     isError,
     refetch: () => void goals.refetch(),

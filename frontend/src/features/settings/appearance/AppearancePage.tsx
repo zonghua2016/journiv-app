@@ -7,8 +7,15 @@ import { PersonalizeSection } from "./PersonalizeSection";
 import { useAppearanceForm } from "./useAppearanceForm";
 import { NativeSelect } from "../../../components/ui/native-select";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { useTranslation } from "react-i18next";
+import {
+  getAppLanguage,
+  setAppLanguage,
+  type AppLanguage,
+} from "../../../i18n";
 
 export function AppearancePage() {
+  const { t } = useTranslation();
   const form = useAppearanceForm();
   useSettingsForm({
     dirty: form.dirty,
@@ -21,11 +28,11 @@ export function AppearancePage() {
   if (form.query.isError)
     return (
       <StatusView
-        title="Appearance couldn’t be loaded"
-        description="Check your connection and try again."
+        title={t("settings.appearanceLoadError")}
+        description={t("timeline.checkConnection")}
         action={
           <Button variant="secondary" onClick={() => form.query.refetch()}>
-            Try again
+            {t("common.retry")}
           </Button>
         }
       />
@@ -33,55 +40,73 @@ export function AppearancePage() {
   return (
     <div className="jv-settings__body">
       <SettingsSection
-        title="Appearance"
-        intro="These are account defaults. The sidebar theme control remains a per-device override."
+        title={t("settings.appearance")}
+        intro={t("settings.appearanceIntro")}
       >
-        <SettingsRow label="Account theme" htmlFor="account-theme">
+        <SettingsRow
+          label={t("language.label")}
+          description={t("language.description")}
+          htmlFor="interface-language"
+        >
+          <NativeSelect
+            id="interface-language"
+            value={getAppLanguage()}
+            onChange={(event) =>
+              void setAppLanguage(event.target.value as AppLanguage)
+            }
+          >
+            <option value="zh-CN">{t("language.zhCN")}</option>
+            <option value="en-US">{t("language.enUS")}</option>
+          </NativeSelect>
+        </SettingsRow>
+        <SettingsRow label={t("settings.accountTheme")} htmlFor="account-theme">
           <NativeSelect
             id="account-theme"
             value={form.theme}
             onChange={(event) => form.setTheme(event.target.value)}
           >
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
+            <option value="system">{t("settings.system")}</option>
+            <option value="light">{t("settings.light")}</option>
+            <option value="dark">{t("settings.dark")}</option>
           </NativeSelect>
         </SettingsRow>
-        <SettingsRow label="Time format" htmlFor="time-format">
+        <SettingsRow label={t("settings.timeFormat")} htmlFor="time-format">
           <NativeSelect
             id="time-format"
             value={form.timeFormat}
             onChange={(event) => form.setTimeFormat(event.target.value)}
           >
-            <option value="system">System</option>
-            <option value="twelve_hour">12-hour</option>
-            <option value="twenty_four_hour">24-hour</option>
+            <option value="system">{t("settings.system")}</option>
+            <option value="twelve_hour">{t("settings.twelveHour")}</option>
+            <option value="twenty_four_hour">
+              {t("settings.twentyFourHour")}
+            </option>
           </NativeSelect>
         </SettingsRow>
-        <SettingsRow label="Week starts on" htmlFor="week-start">
+        <SettingsRow label={t("settings.weekStartsOn")} htmlFor="week-start">
           <NativeSelect
             id="week-start"
             value={form.weekStart}
             onChange={(event) => form.setWeekStart(Number(event.target.value))}
           >
-            <option value={0}>Monday</option>
-            <option value={1}>Tuesday</option>
-            <option value={2}>Wednesday</option>
-            <option value={3}>Thursday</option>
-            <option value={4}>Friday</option>
-            <option value={5}>Saturday</option>
-            <option value={6}>Sunday</option>
+            <option value={0}>{t("settings.monday")}</option>
+            <option value={1}>{t("settings.tuesday")}</option>
+            <option value={2}>{t("settings.wednesday")}</option>
+            <option value={3}>{t("settings.thursday")}</option>
+            <option value={4}>{t("settings.friday")}</option>
+            <option value={5}>{t("settings.saturday")}</option>
+            <option value={6}>{t("settings.sunday")}</option>
           </NativeSelect>
         </SettingsRow>
       </SettingsSection>
       {form.mutation.isError && (
         <p className="jv-settings__alert" role="alert">
-          Appearance settings couldn’t be saved. Your changes are still here.
+          {t("settings.appearanceSaveError")}
         </p>
       )}
       {form.mutation.isSuccess && !form.dirty && (
         <Alert role="status">
-          <AlertDescription>Appearance saved.</AlertDescription>
+          <AlertDescription>{t("settings.appearanceSaved")}</AlertDescription>
         </Alert>
       )}
       <PersonalizeSection />

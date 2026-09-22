@@ -1,6 +1,7 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { CalendarDays, Images, List } from "lucide-react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { buttonVariants } from "../../components/ui/button";
 import { ButtonGroup } from "../../components/ui/button-group";
 import { cx } from "../../lib/cx";
@@ -11,20 +12,24 @@ type ListViewSearch = Record<string, unknown> & {
   view?: "calendar" | "media";
 };
 
-const OPTIONS: Array<{ mode: ViewMode; label: string; icon: ReactNode }> = [
+const OPTIONS: Array<{
+  mode: ViewMode;
+  labelKey: "nav.listView" | "nav.calendarView" | "nav.mediaView";
+  icon: ReactNode;
+}> = [
   {
     mode: "list",
-    label: "List view",
+    labelKey: "nav.listView",
     icon: <List aria-hidden="true" />,
   },
   {
     mode: "calendar",
-    label: "Calendar view",
+    labelKey: "nav.calendarView",
     icon: <CalendarDays aria-hidden="true" />,
   },
   {
     mode: "media",
-    label: "Media view",
+    labelKey: "nav.mediaView",
     icon: <Images aria-hidden="true" />,
   },
 ];
@@ -48,6 +53,7 @@ const OPTIONS: Array<{ mode: ViewMode; label: string; icon: ReactNode }> = [
  * (DESIGN.md).
  */
 export function ListViewSwitch({ className }: { className?: string }) {
+  const { t } = useTranslation();
   const { view } = useSearch({ strict: false }) as {
     view?: "calendar" | "media";
   };
@@ -55,7 +61,7 @@ export function ListViewSwitch({ className }: { className?: string }) {
   return (
     <ButtonGroup
       className={cx("jv-view-switch", className)}
-      aria-label="List view"
+      aria-label={t("nav.listView")}
     >
       {OPTIONS.map((option) => {
         const selected = option.mode === current;
@@ -65,8 +71,8 @@ export function ListViewSwitch({ className }: { className?: string }) {
             data-slot="button"
             className={buttonVariants({ variant: "outline", size: "icon-sm" })}
             aria-current={selected ? "page" : undefined}
-            aria-label={option.label}
-            title={option.label}
+            aria-label={t(option.labelKey)}
+            title={t(option.labelKey)}
             to="."
             search={(prev: ListViewSearch) => ({
               ...prev,

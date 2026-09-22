@@ -1,4 +1,5 @@
 import { Link, useMatchRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { cx } from "../../lib/cx";
 import { SETTINGS_NAV } from "./settingsNav";
 
@@ -15,13 +16,14 @@ export function SettingsNavigation({
   onNavigate?: () => void;
   isAdmin?: boolean;
 }) {
+  const { t } = useTranslation();
   const matchRoute = useMatchRoute();
   const groups = SETTINGS_NAV.filter((group) => !group.adminOnly || isAdmin);
   return (
-    <nav className="jv-settings-nav" aria-label="Settings sections">
+    <nav className="jv-settings-nav" aria-label={t("settings.sections")}>
       {groups.map((group) => (
-        <div className="jv-settings-nav__group" key={group.label}>
-          <p className="jv-settings-nav__label">{group.label}</p>
+        <div className="jv-settings-nav__group" key={group.labelKey}>
+          <p className="jv-settings-nav__label">{t(group.labelKey)}</p>
           {/* The items are wrapped separately from the label so the compact
               settings index can card the destinations and leave the group
               label on the canvas above them (docs/features/settings.md). */}
@@ -41,7 +43,7 @@ export function SettingsNavigation({
                   )}
                   aria-current={selected ? "page" : undefined}
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}

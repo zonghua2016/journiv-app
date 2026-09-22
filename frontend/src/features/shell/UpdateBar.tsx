@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePwaUpdate } from "../../app/pwa/usePwaUpdate";
 import { AppConfirmDialog } from "../../components/journiv/AppConfirmDialog";
 import { Button } from "../../components/ui/button";
@@ -12,6 +13,7 @@ import { useShell } from "./shellContext";
  * explicit confirmation, and never auto-reloads.
  */
 export function UpdateBar() {
+  const { t } = useTranslation();
   const { updateReady, applyUpdate } = usePwaUpdate();
   const { hasUnsavedDraft } = useShell();
   const [dismissed, setDismissed] = useState(false);
@@ -31,14 +33,14 @@ export function UpdateBar() {
     <>
       <div className="jv-update-bar" role="status">
         <span className="text-sm text-foreground">
-          A new version of Journiv is ready.
+          {t("shell.updateReady")}
         </span>
         <div className="jv-update-bar__actions">
           <Button variant="outline" size="sm" onClick={restart}>
-            Restart to update
+            {t("shell.restartToUpdate")}
           </Button>
           <IconButton
-            label="Dismiss"
+            label={t("shell.dismiss")}
             variant="ghost"
             size="sm"
             onClick={() => setDismissed(true)}
@@ -50,9 +52,9 @@ export function UpdateBar() {
       <AppConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title="Restart to update?"
-        description="Restarting may discard unsaved changes. Save your entry first, or continue only if you are willing to lose them."
-        confirmLabel="Restart anyway"
+        title={t("shell.restartTitle")}
+        description={t("shell.restartDescription")}
+        confirmLabel={t("shell.restartAnyway")}
         onConfirm={() => {
           setConfirmOpen(false);
           void applyUpdate();

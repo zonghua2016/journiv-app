@@ -37,8 +37,8 @@ export function shiftMonth(month: string, delta: number): string {
 }
 
 /** "August 2026" for a `YYYY-MM` key. */
-export function monthLabel(month: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+export function monthLabel(month: string, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
@@ -51,6 +51,15 @@ export const MONTH_NAMES: string[] = Array.from({ length: 12 }, (_, i) =>
     noon(`2021-${String(i + 1).padStart(2, "0")}-01`),
   ),
 );
+
+export function monthNames(locale?: string): string[] {
+  return Array.from({ length: 12 }, (_, i) =>
+    new Intl.DateTimeFormat(locale, {
+      month: "long",
+      timeZone: "UTC",
+    }).format(noon(`2021-${String(i + 1).padStart(2, "0")}-01`)),
+  );
+}
 
 /** `{ year, monthIndex }` (0-based month) for a `YYYY-MM` key. */
 export function monthParts(month: string): {
@@ -111,9 +120,18 @@ export function gridRange(month: string): { start: string; end: string } {
 
 export const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+export function weekdayLabels(locale?: string): string[] {
+  return Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(locale, {
+      weekday: "short",
+      timeZone: "UTC",
+    }).format(noon(`2021-08-${String(index + 1).padStart(2, "0")}`)),
+  );
+}
+
 /** "Friday, 8 August 2026" for a `YYYY-MM-DD` day. */
-export function formatDayHeading(iso: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+export function formatDayHeading(iso: string, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",

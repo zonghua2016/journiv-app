@@ -18,6 +18,7 @@ import {
   useState,
   type MutableRefObject,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import { SettingsNavigation } from "./SettingsNavigation";
@@ -126,6 +127,7 @@ export function useSettingsForm(options: {
 }
 
 export function SettingsModal({ section }: { section: SettingsSection }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const navigate = useNavigate();
   const matchRoute = useMatchRoute();
@@ -195,10 +197,10 @@ export function SettingsModal({ section }: { section: SettingsSection }) {
 
   const sectionLabel =
     section === "index"
-      ? "Settings"
+      ? t("settings.title")
       : onIntegrationsDetail
         ? "Immich"
-        : settingsItem(section).label;
+        : t(settingsItem(section).labelKey);
 
   // The action bar only makes sense against a real section form, never the
   // bare compact index.
@@ -215,7 +217,9 @@ export function SettingsModal({ section }: { section: SettingsSection }) {
         <Dialog.Portal>
           <Dialog.Backdrop className="z-[42] fixed inset-0 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
           <Dialog.Popup className="jv-settings-popup">
-            <Dialog.Title className="sr-only">Settings</Dialog.Title>
+            <Dialog.Title className="sr-only">
+              {t("settings.title")}
+            </Dialog.Title>
             <div className="jv-settings">
               {/* The modal's own header — a flex sibling above the one scroll
                   owner, never sticky (DESIGN.md). One close control. */}
@@ -224,8 +228,8 @@ export function SettingsModal({ section }: { section: SettingsSection }) {
                   <IconButton
                     label={
                       onIntegrationsDetail
-                        ? "Back to integrations"
-                        : "Back to settings"
+                        ? t("settings.backToIntegrations")
+                        : t("settings.backToSettings")
                     }
                     className="jv-settings__back"
                     nativeButton={false}
@@ -245,13 +249,13 @@ export function SettingsModal({ section }: { section: SettingsSection }) {
                   </IconButton>
                 )}
                 <span className="jv-settings__title jv-desktop-only">
-                  Settings
+                  {t("settings.title")}
                 </span>
                 <span className="jv-settings__title jv-compact-only">
                   {sectionLabel}
                 </span>
                 <IconButton
-                  label="Close settings"
+                  label={t("settings.closeSettings")}
                   className="jv-settings__close"
                   onClick={close}
                 >
@@ -296,8 +300,8 @@ export function SettingsModal({ section }: { section: SettingsSection }) {
                       onClick={() => saveRef.current?.()}
                     >
                       {saveState.pending
-                        ? (saveState.pendingLabel ?? "Saving…")
-                        : (saveState.label ?? "Save changes")}
+                        ? (saveState.pendingLabel ?? t("settings.saving"))
+                        : (saveState.label ?? t("common.saveChanges"))}
                     </Button>
                   </div>
                 )}

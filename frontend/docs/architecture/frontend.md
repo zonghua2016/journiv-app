@@ -13,6 +13,7 @@ visual-verification work. It is not a visual design specification; use
 | `src/components/journiv/` | a product pattern shared by at least two features |
 | `src/api/` | generated client, hand-written wrapper, auth, query keys/options |
 | `src/app/` | router, query client, global light/dark theme |
+| `src/i18n/` | language initialization, persistence, and translation resources |
 | `src/app/pwa/` | manifest shortcuts list, service-worker registration and update state (`docs/features/pwa.md`) |
 | `src/app/offline/` | bounded offline read cache, offline-restricted mode (`docs/features/pwa.md`) |
 | `src/features/<feature>/` | feature UI and scoped CSS |
@@ -36,6 +37,21 @@ Neutral collapses to one value (invisible selection, worst in dark). It conforms
 those states to DESIGN.md's accent selection role in a single unlayered
 stylesheet so every current and future picker inherits it — do not re-patch this
 per feature.
+
+## Internationalization
+
+The React frontend uses `i18next` through `react-i18next`. Simplified Chinese
+(`zh-CN`) is the product default and English (`en-US`) is the fallback and
+secondary interface language. The per-device choice is stored under
+`journiv.language`, applied before the first React render, and kept in sync with
+the root document's `lang` attribute.
+
+User-facing copy belongs in `src/i18n/resources.ts` and components read it with
+`useTranslation`; do not add new inline English or Chinese strings to localized
+surfaces. Use interpolation and i18next plural forms for dynamic copy. Date and
+number formatters must use the active i18n locale instead of assuming the
+browser locale. The language selector lives in Settings → Theme & time and is a
+device setting, not part of the server-backed appearance form.
 
 ## Routing and responsive model
 

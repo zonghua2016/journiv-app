@@ -34,21 +34,23 @@ import {
   formatDayHeading,
   gridRange,
   isMonthKey,
-  MONTH_NAMES,
+  monthNames,
   monthKeyOf,
   monthLabel,
   monthParts,
   shiftMonth,
-  WEEKDAY_LABELS,
+  weekdayLabels,
   yearOptions,
 } from "./calendarGrid";
 import "./calendar.css";
 import { NativeSelect } from "../../components/ui/native-select";
+import { useTranslation } from "react-i18next";
 
 const viewerTimezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
 export function CalendarPane() {
+  const { t, i18n } = useTranslation();
   const params = useParams({ strict: false }) as {
     journalId?: string;
     momentId?: string;
@@ -73,6 +75,8 @@ export function CalendarPane() {
   const cells = buildMonthGrid(month);
   const { year, monthIndex } = monthParts(month);
   const years = yearOptions(year);
+  const localizedMonthNames = monthNames(i18n.resolvedLanguage);
+  const localizedWeekdayLabels = weekdayLabels(i18n.resolvedLanguage);
 
   const calendar = useQuery(
     momentCalendarQuery({ journal_id: params.journalId, start, end }),
@@ -100,17 +104,20 @@ export function CalendarPane() {
     });
 
   return (
-    <section className="jv-shell__list" aria-label="Calendar">
+    <section className="jv-shell__list" aria-label={t("calendar.title")}>
       <PageBar
         className="jv-page-bar--compact-only"
         leading={
-          <IconButton label="Open navigation" onClick={shell.openNavigation}>
+          <IconButton
+            label={t("nav.openNavigation")}
+            onClick={shell.openNavigation}
+          >
             <Menu aria-hidden="true" size={19} />
           </IconButton>
         }
         title={
           <span className="jv-label jv-truncate">
-            {scopeJournal?.title ?? "All journals"}
+            {scopeJournal?.title ?? t("nav.allJournals")}
           </span>
         }
       />
@@ -118,13 +125,13 @@ export function CalendarPane() {
       <header className="jv-list-header">
         <div className="jv-list-header__row">
           <h1 className="jv-display jv-list-header__title">
-            <span className="jv-truncate">Calendar</span>
+            <span className="jv-truncate">{t("calendar.title")}</span>
           </h1>
           <ListViewSwitch className="jv-list-header__switch" />
         </div>
         <div className="jv-calendar__nav">
           <IconButton
-            label="Previous month"
+            label={t("calendar.previousMonth")}
             variant="ghost"
             onClick={() => goToMonth(shiftMonth(month, -1))}
           >
@@ -132,7 +139,7 @@ export function CalendarPane() {
           </IconButton>
           <div className="jv-calendar__picker">
             <label className="sr-only" htmlFor="jv-calendar-month">
-              Month
+              {t("calendar.month")}
             </label>
             <NativeSelect
               id="jv-calendar-month"
@@ -142,14 +149,14 @@ export function CalendarPane() {
                 goToMonth(monthKeyOf(year, Number(event.target.value)))
               }
             >
-              {MONTH_NAMES.map((name, index) => (
+              {localizedMonthNames.map((name, index) => (
                 <option key={name} value={index}>
                   {name}
                 </option>
               ))}
             </NativeSelect>
             <label className="sr-only" htmlFor="jv-calendar-year">
-              Year
+              {t("calendar.year")}
             </label>
             <NativeSelect
               id="jv-calendar-year"
@@ -167,10 +174,10 @@ export function CalendarPane() {
             </NativeSelect>
           </div>
           <span className="sr-only" role="status" aria-live="polite">
-            {monthLabel(month)}
+            {monthLabel(month, i18n.resolvedLanguage)}
           </span>
           <IconButton
-            label="Next month"
+            label={t("calendar.nextMonth")}
             variant="ghost"
             onClick={() => goToMonth(shiftMonth(month, 1))}
           >
@@ -194,7 +201,7 @@ export function CalendarPane() {
               />
             }
           >
-            Today
+            {t("calendar.today")}
           </Button>
         </div>
       </header>
@@ -205,18 +212,18 @@ export function CalendarPane() {
             role="alert"
             tone="danger"
             icon={<TriangleAlert size={20} />}
-            title="The calendar could not be loaded"
-            description="Check your connection and try again."
+            title={t("calendar.loadError")}
+            description={t("timeline.checkConnection")}
             action={
               <Button variant="secondary" onClick={() => calendar.refetch()}>
-                Try again
+                {t("common.retry")}
               </Button>
             }
           />
         ) : (
           <>
             <div className="jv-calendar__grid">
-              {WEEKDAY_LABELS.map((label) => (
+              {localizedWeekdayLabels.map((label) => (
                 <div key={label} className="jv-calendar__weekday">
                   {label}
                 </div>
@@ -247,8 +254,6 @@ export function CalendarPane() {
                         </div>
                       );
                     }
-                    const countWord =
-                      item.moment_count === 1 ? "moment" : "moments";
                     return (
                       <Link
                         key={cell.iso}
@@ -256,7 +261,7 @@ export function CalendarPane() {
                         params={listParams}
                         search={{ ...baseSearch, date: cell.iso }}
                         replace
-                        aria-label={`${formatDayHeading(cell.iso)}, ${item.moment_count} ${countWord}`}
+                        aria-label={`${formatDayHeading(cell.iso, i18n.resolvedLanguage)}, ${t("calendar.momentCount", { count: item.moment_count })}`}
                         aria-current={isSelected ? "date" : undefined}
                         className={cx(
                           "jv-calendar__cell",
@@ -324,6 +329,7 @@ function SelectedDay({
   q: string;
   journals: ReturnType<typeof useJournalLookup>;
 }) {
+  const { t, i18n } = useTranslation();
   const data = useInfiniteQuery(
     momentsQuery({ journal_id: journalId, start_date: date, end_date: date }),
   );
@@ -332,10 +338,10 @@ function SelectedDay({
   return (
     <section
       className="jv-calendar__day-panel"
-      aria-label={formatDayHeading(date)}
+      aria-label={formatDayHeading(date, i18n.resolvedLanguage)}
     >
       <h2 className="jv-section-title jv-calendar__day-heading">
-        {formatDayHeading(date)}
+        {formatDayHeading(date, i18n.resolvedLanguage)}
       </h2>
       {data.isLoading && (
         <div className="jv-calendar__day-loading" role="status">
@@ -348,10 +354,10 @@ function SelectedDay({
           role="alert"
           tone="danger"
           icon={<TriangleAlert size={20} />}
-          title="That day's moments could not be loaded"
+          title={t("calendar.dayLoadError")}
           action={
             <Button variant="secondary" onClick={() => data.refetch()}>
-              Try again
+              {t("common.retry")}
             </Button>
           }
         />
@@ -359,7 +365,7 @@ function SelectedDay({
       {!data.isLoading && !data.isError && !moments.length && (
         <StatusView
           icon={<CalendarRange size={20} />}
-          title="Nothing written this day"
+          title={t("calendar.nothingWritten")}
         />
       )}
       {moments.map((moment) => (

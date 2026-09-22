@@ -14,6 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { momentsQuery } from "../../api/query/options";
 import { ListViewSwitch } from "../../components/journiv/ListViewSwitch";
 import { PageBar } from "../../components/journiv/PageBar";
@@ -31,6 +32,7 @@ import { scopeSearchFrom, useMomentScope } from "./momentScope";
 import "./timeline.css";
 
 export function TimelinePage() {
+  const { t } = useTranslation();
   const search = useSearch({ strict: false }) as {
     q?: string;
     person?: string;
@@ -86,18 +88,21 @@ export function TimelinePage() {
   const groups = groupMomentsByDay(moments);
 
   return (
-    <section className="jv-shell__list" aria-label="Timeline">
+    <section className="jv-shell__list" aria-label={t("timeline.ariaLabel")}>
       <PageBar
         className="jv-page-bar--compact-only"
         leading={
-          <IconButton label="Open navigation" onClick={shell.openNavigation}>
+          <IconButton
+            label={t("nav.openNavigation")}
+            onClick={shell.openNavigation}
+          >
             <Menu aria-hidden="true" size={19} />
           </IconButton>
         }
         title={<span className="jv-label jv-truncate">{scope.title}</span>}
         actions={
           QUICK_LOG_ENABLED ? (
-            <IconButton label="Quick log" onClick={shell.openQuickLog}>
+            <IconButton label={t("nav.quickLog")} onClick={shell.openQuickLog}>
               <Zap aria-hidden="true" size={19} />
             </IconButton>
           ) : undefined
@@ -108,7 +113,7 @@ export function TimelinePage() {
         {scope.kind !== "all" && (
           <Link className="jv-scope-clear" to="/timeline" search={{ q: "" }}>
             <ArrowLeft aria-hidden="true" size={14} />
-            All moments
+            {t("timeline.allMoments")}
           </Link>
         )}
         <div className="jv-list-header__row">
@@ -120,7 +125,7 @@ export function TimelinePage() {
         </div>
         <SearchInput
           label={scope.searchLabel}
-          placeholder="Search"
+          placeholder={t("common.search")}
           value={input}
           onChange={(event) => setInput(event.target.value)}
           onClear={() => setInput("")}
@@ -140,8 +145,8 @@ export function TimelinePage() {
             role="alert"
             tone="danger"
             icon={<TriangleAlert size={20} />}
-            title="Moments could not be loaded"
-            description="Check your connection and try again."
+            title={t("timeline.loadError")}
+            description={t("timeline.checkConnection")}
             action={
               <Button
                 variant="secondary"
@@ -150,7 +155,7 @@ export function TimelinePage() {
                   scope.refetch();
                 }}
               >
-                Try again
+                {t("common.retry")}
               </Button>
             }
           />
@@ -164,11 +169,11 @@ export function TimelinePage() {
           (search.q ? (
             <StatusView
               icon={<SearchX size={20} />}
-              title={`No moments match “${search.q}”`}
-              description="Try a shorter or different search."
+              title={t("timeline.noSearchResults", { query: search.q })}
+              description={t("timeline.searchSuggestion")}
               action={
                 <Button variant="secondary" onClick={() => setInput("")}>
-                  Clear search
+                  {t("common.clearSearch")}
                 </Button>
               }
             />
@@ -198,7 +203,7 @@ export function TimelinePage() {
                       />
                     }
                   >
-                    Write your first entry
+                    {t("timeline.writeFirstEntry")}
                   </Button>
                 ) : undefined
               }
@@ -229,7 +234,9 @@ export function TimelinePage() {
               onClick={() => data.fetchNextPage()}
               disabled={data.isFetchingNextPage || data.isPlaceholderData}
             >
-              {data.isFetchingNextPage ? "Loading…" : "Load more"}
+              {data.isFetchingNextPage
+                ? t("common.loading")
+                : t("common.loadMore")}
             </Button>
           </div>
         )}
@@ -239,8 +246,13 @@ export function TimelinePage() {
 }
 
 function TimelineSkeleton() {
+  const { t } = useTranslation();
   return (
-    <div className="jv-list__group" role="status" aria-label="Loading moments">
+    <div
+      className="jv-list__group"
+      role="status"
+      aria-label={t("timeline.loadingMoments")}
+    >
       <div className="jv-list__day">
         <Skeleton height="0.8rem" width="7rem" />
       </div>

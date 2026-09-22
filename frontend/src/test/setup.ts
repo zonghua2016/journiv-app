@@ -3,6 +3,7 @@ import { cleanup, configure } from "@testing-library/react";
 import { afterEach } from "vitest";
 import { closeDraftDb } from "../features/editor/draftRepository";
 import { installMatchMediaStub, resetTestViewportWidth } from "./viewport";
+import i18n from "../i18n";
 
 /**
  * jsdom ships no IndexedDB, and the editor keeps local drafts in one. Without
@@ -53,6 +54,10 @@ Object.defineProperty(window, "localStorage", {
   configurable: true,
   value: memoryLocalStorage,
 });
+// Production defaults to Chinese. Existing component tests deliberately run
+// in English unless a test is specifically exercising language switching.
+memoryLocalStorage.setItem("journiv.language", "en-US");
+void i18n.changeLanguage("en-US");
 Object.defineProperty(window, "scrollTo", {
   configurable: true,
   value: () => undefined,

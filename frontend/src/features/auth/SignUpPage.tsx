@@ -1,6 +1,7 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sessionStore, userIdFromAuthResponse } from "../../api/auth/session";
 import { api } from "../../api/client/api";
 import { ApiError } from "../../api/client/errors";
@@ -37,6 +38,7 @@ export function signUpErrorMessage(error: unknown): string {
 }
 
 export function SignUpPage() {
+  const { t } = useTranslation();
   const nameId = useId();
   const emailId = useId();
   const passwordId = useId();
@@ -61,15 +63,15 @@ export function SignUpPage() {
 
   const trimmedName = name.trim();
   const trimmedEmail = email.trim().toLowerCase();
-  const nameError = trimmedName ? "" : "Enter your name.";
+  const nameError = trimmedName ? "" : t("auth.enterName");
   const emailError = EMAIL_PATTERN.test(trimmedEmail)
     ? ""
-    : "Enter a valid email address.";
-  const passwordError = password ? "" : "Enter a password.";
+    : t("auth.enterValidEmail");
+  const passwordError = password ? "" : t("auth.enterPassword");
   const confirmError = !confirm
-    ? "Confirm your password."
+    ? t("auth.confirmPasswordError")
     : confirm !== password
-      ? "The passwords don’t match."
+      ? t("auth.passwordsMismatch")
       : "";
   const invalid = Boolean(
     nameError || emailError || passwordError || confirmError,
@@ -121,12 +123,12 @@ export function SignUpPage() {
   if (instanceConfig.isLoading) {
     return (
       <AuthCard
-        heading="Checking sign up"
+        heading={t("auth.checkingSignUp")}
         busy
         lede={
           <p className="jv-auth__lede jv-auth__status" role="status">
             <Spinner aria-hidden />
-            Checking whether this instance accepts new accounts…
+            {t("auth.checkingSignUpDetail")}
           </p>
         }
       />
@@ -136,16 +138,16 @@ export function SignUpPage() {
   if (!instanceConfig.data) {
     return (
       <AuthCard
-        heading="Sign up unavailable"
-        lede="Journiv couldn’t check whether this instance accepts new accounts."
+        heading={t("auth.signUpUnavailable")}
+        lede={t("auth.signUpUnavailableDetail")}
       >
         <Button variant="default" onClick={() => void instanceConfig.refetch()}>
-          Try again
+          {t("common.retry")}
         </Button>
         <p className="jv-auth__alternate jv-caption">
-          Already have an account?{" "}
+          {t("auth.alreadyHaveAccount")}{" "}
           <Link to="/login" search={{ returnTo }}>
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </p>
       </AuthCard>
@@ -155,8 +157,8 @@ export function SignUpPage() {
   if (instanceConfig.data.oidc_only) {
     return (
       <AuthCard
-        heading="Create or access your account"
-        lede="This Journiv instance uses single sign-on. Your administrator controls whether your identity provider account can create a new Journiv account."
+        heading={t("auth.createOrAccess")}
+        lede={t("auth.createOrAccessDetail")}
       >
         <OidcAction returnTo={returnTo} primary />
       </AuthCard>
@@ -167,14 +169,14 @@ export function SignUpPage() {
     if (instanceConfig.data.oidc_enabled) {
       return (
         <AuthCard
-          heading="Password sign up is disabled"
-          lede="You can still continue with single sign-on. Your administrator controls whether new Journiv accounts are created through the identity provider."
+          heading={t("auth.passwordSignUpDisabled")}
+          lede={t("auth.passwordSignUpDisabledDetail")}
         >
           <OidcAction returnTo={returnTo} primary />
           <p className="jv-auth__alternate jv-caption">
-            Already have an account?{" "}
+            {t("auth.alreadyHaveAccount")}{" "}
             <Link to="/login" search={{ returnTo }}>
-              Return to sign in
+              {t("auth.returnToSignIn")}
             </Link>
           </p>
         </AuthCard>
@@ -182,15 +184,15 @@ export function SignUpPage() {
     }
     return (
       <AuthCard
-        heading="Sign up is disabled"
-        lede="This Journiv instance is not accepting new accounts. An administrator can enable sign up in the server configuration and restart Journiv."
+        heading={t("auth.signUpDisabled")}
+        lede={t("auth.signUpDisabledDetail")}
       >
         <Link
           className={buttonVariants({ variant: "default" })}
           to="/login"
           search={{ returnTo }}
         >
-          Return to sign in
+          {t("auth.returnToSignIn")}
         </Link>
       </AuthCard>
     );
@@ -199,15 +201,15 @@ export function SignUpPage() {
   if (accountCreated) {
     return (
       <AuthCard
-        heading="Account created"
-        lede="Your account is ready, but we couldn’t sign you in automatically. Sign in to continue to your journal."
+        heading={t("auth.accountCreated")}
+        lede={t("auth.accountCreatedDetail")}
       >
         <Link
           className={buttonVariants({ variant: "default" })}
           to="/login"
           search={{ returnTo }}
         >
-          Sign in
+          {t("auth.signIn")}
         </Link>
       </AuthCard>
     );
@@ -215,13 +217,13 @@ export function SignUpPage() {
 
   return (
     <AuthCard
-      heading="Create your account"
-      lede="A private place for the moments you want to remember."
+      heading={t("auth.createYourAccount")}
+      lede={t("auth.createYourAccountDetail")}
     >
       <form className="jv-auth__form" noValidate onSubmit={submit}>
         <FieldGroup className="jv-auth__fields">
           <Field data-invalid={touched && Boolean(nameError)}>
-            <FieldLabel htmlFor={nameId}>Name</FieldLabel>
+            <FieldLabel htmlFor={nameId}>{t("auth.name")}</FieldLabel>
             <Input
               id={nameId}
               name="name"
@@ -240,7 +242,7 @@ export function SignUpPage() {
           </Field>
 
           <Field data-invalid={touched && Boolean(emailError)}>
-            <FieldLabel htmlFor={emailId}>Email</FieldLabel>
+            <FieldLabel htmlFor={emailId}>{t("auth.email")}</FieldLabel>
             <Input
               id={emailId}
               name="email"
@@ -262,7 +264,7 @@ export function SignUpPage() {
           </Field>
 
           <Field data-invalid={touched && Boolean(passwordError)}>
-            <FieldLabel htmlFor={passwordId}>Password</FieldLabel>
+            <FieldLabel htmlFor={passwordId}>{t("auth.password")}</FieldLabel>
             <Input
               id={passwordId}
               name="password"
@@ -278,7 +280,7 @@ export function SignUpPage() {
               onChange={(event) => setPassword(event.target.value)}
             />
             <FieldDescription id={`${passwordId}-description`}>
-              Use a unique password you don’t use elsewhere.
+              {t("auth.uniquePassword")}
             </FieldDescription>
             {touched && passwordError && (
               <FieldError id={`${passwordId}-error`}>
@@ -288,7 +290,9 @@ export function SignUpPage() {
           </Field>
 
           <Field data-invalid={touched && Boolean(confirmError)}>
-            <FieldLabel htmlFor={confirmId}>Confirm password</FieldLabel>
+            <FieldLabel htmlFor={confirmId}>
+              {t("auth.confirmPassword")}
+            </FieldLabel>
             <Input
               id={confirmId}
               name="confirm-password"
@@ -315,7 +319,7 @@ export function SignUpPage() {
 
         <Button type="submit" variant="default" disabled={pending}>
           {pending && <Spinner data-icon="inline-start" aria-hidden />}
-          {pending ? "Creating account…" : "Create account"}
+          {pending ? t("auth.creatingAccount") : t("auth.createAccountButton")}
         </Button>
       </form>
 
@@ -323,7 +327,7 @@ export function SignUpPage() {
         <>
           <div className="jv-auth__divider">
             <Separator aria-hidden="true" />
-            <span className="jv-caption">or</span>
+            <span className="jv-caption">{t("common.or")}</span>
             <Separator aria-hidden="true" />
           </div>
           <OidcAction returnTo={returnTo} />
@@ -331,9 +335,9 @@ export function SignUpPage() {
       )}
 
       <p className="jv-auth__alternate jv-caption">
-        Already have an account?{" "}
+        {t("auth.alreadyHaveAccount")}{" "}
         <Link to="/login" search={{ returnTo }}>
-          Sign in
+          {t("auth.signIn")}
         </Link>
       </p>
     </AuthCard>

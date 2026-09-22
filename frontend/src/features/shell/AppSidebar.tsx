@@ -27,6 +27,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import type {
   JournalResponse,
   UserResponse,
@@ -59,6 +60,7 @@ export function AppSidebar({
   loadingUser: boolean;
   onNavigate?: () => void;
 }) {
+  const { t } = useTranslation();
   const { journals, isLoading, isError, refetch } = useJournalLookup();
   const navigate = useNavigate();
   const shell = useShell();
@@ -86,7 +88,7 @@ export function AppSidebar({
         variant="brand"
         className="jv-nav__new"
         disabled={offline}
-        title={offline ? "New entries need a connection" : undefined}
+        title={offline ? t("nav.newEntryOffline") : undefined}
         {...(offline
           ? {}
           : {
@@ -101,7 +103,7 @@ export function AppSidebar({
             })}
       >
         <Plus aria-hidden="true" size={16} />
-        New entry
+        {t("nav.newEntry")}
       </Button>
 
       {QUICK_LOG_ENABLED ? (
@@ -117,17 +119,17 @@ export function AppSidebar({
           }}
         >
           <Zap aria-hidden="true" size={16} />
-          Quick log
+          {t("nav.quickLog")}
         </Button>
       ) : null}
 
-      <nav className="jv-nav__group" aria-label="Views">
+      <nav className="jv-nav__group" aria-label={t("nav.views")}>
         <NavItem
           to="/timeline"
           onNavigate={onNavigate}
           icon={<Clock3 aria-hidden="true" size={16} />}
         >
-          Timeline
+          {t("nav.timeline")}
         </NavItem>
         <NavItem
           to="/timeline"
@@ -135,7 +137,7 @@ export function AppSidebar({
           onNavigate={onNavigate}
           icon={<CalendarDays aria-hidden="true" size={16} />}
         >
-          Calendar
+          {t("nav.calendar")}
         </NavItem>
         <NavItem
           to="/timeline"
@@ -143,18 +145,18 @@ export function AppSidebar({
           onNavigate={onNavigate}
           icon={<Images aria-hidden="true" size={16} />}
         >
-          Media
+          {t("nav.media")}
         </NavItem>
         <InsightsNavItem onNavigate={onNavigate} />
       </nav>
 
-      <p className="jv-nav__section">Journals</p>
-      <nav className="jv-nav__group" aria-label="Journals">
+      <p className="jv-nav__section">{t("nav.journals")}</p>
+      <nav className="jv-nav__group" aria-label={t("nav.journals")}>
         {isLoading && (
           <div
             className="jv-nav__loading"
             role="status"
-            aria-label="Loading journals"
+            aria-label={t("nav.loadingJournals")}
           >
             <Skeleton height="1rem" width="70%" />
             <Skeleton height="1rem" width="55%" />
@@ -168,7 +170,7 @@ export function AppSidebar({
             onClick={() => refetch()}
           >
             <RefreshCw aria-hidden="true" size={15} />
-            Retry journals
+            {t("nav.retryJournals")}
           </Button>
         )}
         {!isLoading &&
@@ -183,49 +185,49 @@ export function AppSidebar({
         {!isLoading && !isError && <AllJournalsItem onNavigate={onNavigate} />}
       </nav>
 
-      <p className="jv-nav__section">Library</p>
-      <nav className="jv-nav__group" aria-label="Library">
+      <p className="jv-nav__section">{t("nav.library")}</p>
+      <nav className="jv-nav__group" aria-label={t("nav.library")}>
         <NavItem
           to="/settings/journaling/people"
           onNavigate={onNavigate}
           icon={<Users aria-hidden="true" size={16} />}
         >
-          People
+          {t("nav.people")}
         </NavItem>
         <NavItem
           to="/library/prompts"
           onNavigate={onNavigate}
           icon={<Sparkles aria-hidden="true" size={16} />}
         >
-          Prompts
+          {t("nav.prompts")}
         </NavItem>
         <NavItem
           to="/library/tags"
           onNavigate={onNavigate}
           icon={<Tags aria-hidden="true" size={16} />}
         >
-          Tags
+          {t("nav.tags")}
         </NavItem>
         <NavItem
           to="/settings/journaling/moods"
           onNavigate={onNavigate}
           icon={<Smile aria-hidden="true" size={16} />}
         >
-          Moods
+          {t("nav.moods")}
         </NavItem>
         <NavItem
           to="/settings/journaling/activities"
           onNavigate={onNavigate}
           icon={<Activity aria-hidden="true" size={16} />}
         >
-          Activities
+          {t("nav.activities")}
         </NavItem>
         <NavItem
           to="/settings/journaling/goals"
           onNavigate={onNavigate}
           icon={<Target aria-hidden="true" size={16} />}
         >
-          Goals
+          {t("nav.goals")}
         </NavItem>
       </nav>
 
@@ -246,7 +248,7 @@ export function AppSidebar({
             </div>
           )}
           <IconButton
-            label="Settings"
+            label={t("nav.settings")}
             onClick={() => {
               navigate({
                 to: "/settings",
@@ -259,7 +261,7 @@ export function AppSidebar({
             <Settings aria-hidden="true" size={16} />
           </IconButton>
           <IconButton
-            label="Log out"
+            label={t("nav.logOut")}
             onClick={() => {
               const useSingleSignOut = user?.is_oidc_user === true;
               void signOut();
@@ -356,6 +358,7 @@ function JournalNavItem({
  *  search differs from the timeline `NavItem` contract, so it is a small
  *  standalone link like `AllJournalsItem`. */
 function InsightsNavItem({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useTranslation();
   const matchRoute = useMatchRoute();
   const selected = Boolean(matchRoute({ to: "/insights" }));
   return (
@@ -367,7 +370,7 @@ function InsightsNavItem({ onNavigate }: { onNavigate?: () => void }) {
       aria-current={selected ? "page" : undefined}
     >
       <ChartNoAxesCombined aria-hidden="true" size={16} />
-      <span className="jv-truncate">Insights</span>
+      <span className="jv-truncate">{t("nav.insights")}</span>
     </Link>
   );
 }
@@ -375,6 +378,7 @@ function InsightsNavItem({ onNavigate }: { onNavigate?: () => void }) {
 /** Opens the Journals screen — the only route to archived journals and to
  *  creating or managing any journal. */
 function AllJournalsItem({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useTranslation();
   const matchRoute = useMatchRoute();
   const selected = Boolean(matchRoute({ to: "/journals" }));
   return (
@@ -386,30 +390,35 @@ function AllJournalsItem({ onNavigate }: { onNavigate?: () => void }) {
       aria-current={selected ? "page" : undefined}
     >
       <Library aria-hidden="true" size={16} />
-      <span className="jv-truncate">All journals</span>
+      <span className="jv-truncate">{t("nav.allJournals")}</span>
     </Link>
   );
 }
 
-const THEMES: Array<{ mode: ThemeMode; label: string; icon: ReactNode }> = [
+const THEMES: Array<{
+  mode: ThemeMode;
+  labelKey: "nav.lightTheme" | "nav.darkTheme" | "nav.systemTheme";
+  icon: ReactNode;
+}> = [
   {
     mode: "light",
-    label: "Light theme",
+    labelKey: "nav.lightTheme",
     icon: <Sun aria-hidden="true" />,
   },
   {
     mode: "dark",
-    label: "Dark theme",
+    labelKey: "nav.darkTheme",
     icon: <Moon aria-hidden="true" />,
   },
   {
     mode: "system",
-    label: "Match system theme",
+    labelKey: "nav.systemTheme",
     icon: <Monitor aria-hidden="true" />,
   },
 ];
 
 function ThemeControl() {
+  const { t } = useTranslation();
   const theme = useTheme();
   return (
     <ToggleGroup
@@ -417,7 +426,7 @@ function ThemeControl() {
       variant="outline"
       size="sm"
       className="jv-theme-control"
-      aria-label="Theme"
+      aria-label={t("nav.theme")}
       value={[theme.mode]}
       onValueChange={([next]) => {
         // A group with one selectable option never emits an empty value here,
@@ -429,8 +438,8 @@ function ThemeControl() {
         <ToggleGroupItem
           key={option.mode}
           value={option.mode}
-          aria-label={option.label}
-          title={option.label}
+          aria-label={t(option.labelKey)}
+          title={t(option.labelKey)}
         >
           {option.icon}
         </ToggleGroupItem>

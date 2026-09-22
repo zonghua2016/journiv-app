@@ -10,6 +10,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { MediaLibraryItem } from "../../api/generated/types.gen";
 import { mediaLibraryQuery } from "../../api/query/options";
 import { ListViewSwitch } from "../../components/journiv/ListViewSwitch";
@@ -28,6 +29,7 @@ import "./media.css";
 const SKELETON_KEYS = Array.from({ length: 12 }, (_, i) => `sk-${i}`);
 
 export function MediaPane() {
+  const { t } = useTranslation();
   const params = useParams({ strict: false }) as {
     journalId?: string;
     momentId?: string;
@@ -64,17 +66,20 @@ export function MediaPane() {
   );
 
   return (
-    <section className="jv-shell__list" aria-label="Media">
+    <section className="jv-shell__list" aria-label={t("media.title")}>
       <PageBar
         className="jv-page-bar--compact-only"
         leading={
-          <IconButton label="Open navigation" onClick={shell.openNavigation}>
+          <IconButton
+            label={t("nav.openNavigation")}
+            onClick={shell.openNavigation}
+          >
             <Menu aria-hidden="true" size={19} />
           </IconButton>
         }
         title={
           <span className="jv-label jv-truncate">
-            {scopeJournal?.title ?? "All journals"}
+            {scopeJournal?.title ?? t("nav.allJournals")}
           </span>
         }
       />
@@ -82,7 +87,7 @@ export function MediaPane() {
       <header className="jv-list-header">
         <div className="jv-list-header__row">
           <h1 className="jv-display jv-list-header__title">
-            <span className="jv-truncate">Media</span>
+            <span className="jv-truncate">{t("media.title")}</span>
           </h1>
           <ListViewSwitch className="jv-list-header__switch" />
         </div>
@@ -96,11 +101,11 @@ export function MediaPane() {
             role="alert"
             tone="danger"
             icon={<TriangleAlert size={20} />}
-            title="Media could not be loaded"
-            description="Check your connection and try again."
+            title={t("media.loadError")}
+            description={t("timeline.checkConnection")}
             action={
               <Button variant="secondary" onClick={() => data.refetch()}>
-                Try again
+                {t("common.retry")}
               </Button>
             }
           />
@@ -109,11 +114,9 @@ export function MediaPane() {
         {!data.isLoading && !data.isError && !items.length && (
           <StatusView
             icon={<Images size={20} />}
-            title="No photos yet"
+            title={t("media.empty")}
             description={
-              params.journalId
-                ? "Photos and videos added to this journal's entries will appear here."
-                : "Photos and videos you add to entries will appear here."
+              params.journalId ? t("media.emptyJournal") : t("media.emptyAll")
             }
           />
         )}
@@ -144,7 +147,9 @@ export function MediaPane() {
               onClick={() => data.fetchNextPage()}
               disabled={data.isFetchingNextPage}
             >
-              {data.isFetchingNextPage ? "Loading…" : "Load more"}
+              {data.isFetchingNextPage
+                ? t("common.loading")
+                : t("common.loadMore")}
             </Button>
           </div>
         )}
@@ -168,6 +173,7 @@ function MediaTile({
   broken: boolean;
   onThumbError: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const className = cx("jv-media-tile", selected && "is-selected");
   const linkProps = journalId
     ? {
@@ -183,10 +189,10 @@ function MediaTile({
 
   const label =
     item.media_type === "video"
-      ? "Video"
+      ? t("media.video")
       : item.media_type === "audio"
-        ? "Audio clip"
-        : item.alt_text || "Photo";
+        ? t("media.audio")
+        : item.alt_text || t("media.photo");
 
   let inner: React.ReactNode;
   if (item.media_type === "audio") {

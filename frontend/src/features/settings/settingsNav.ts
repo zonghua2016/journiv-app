@@ -38,13 +38,13 @@ export type SettingsNavItem = {
     | "export"
     | "help"
     | "about";
-  label: string;
+  labelKey: string;
   to: SettingsRouteTo;
 };
 
 export type SettingsNavGroup = {
   /** Quiet hierarchy label (sentence case — DESIGN.md). */
-  label: string;
+  labelKey: string;
   items: SettingsNavItem[];
   /** Administration is visible only after the shared current-user query says
    *  the viewer is an administrator. */
@@ -53,52 +53,82 @@ export type SettingsNavGroup = {
 
 export const SETTINGS_NAV: SettingsNavGroup[] = [
   {
-    label: "Account",
+    labelKey: "settings.account",
     items: [
-      { id: "profile", label: "Profile", to: "/settings/profile" },
-      { id: "security", label: "Security", to: "/settings/security" },
+      { id: "profile", labelKey: "settings.profile", to: "/settings/profile" },
+      {
+        id: "security",
+        labelKey: "settings.security",
+        to: "/settings/security",
+      },
     ],
   },
   {
-    label: "Appearance",
+    labelKey: "settings.appearanceGroup",
     items: [
-      { id: "appearance", label: "Theme & time", to: "/settings/appearance" },
+      {
+        id: "appearance",
+        labelKey: "settings.themeAndTime",
+        to: "/settings/appearance",
+      },
     ],
   },
   {
-    label: "App",
-    items: [{ id: "app", label: "Install & offline", to: "/settings/app" }],
-  },
-  {
-    label: "Integrations",
+    labelKey: "settings.app",
     items: [
-      { id: "integrations", label: "Providers", to: "/settings/integrations" },
+      { id: "app", labelKey: "settings.installOffline", to: "/settings/app" },
     ],
   },
   {
-    label: "Administration",
+    labelKey: "settings.integrations",
+    items: [
+      {
+        id: "integrations",
+        labelKey: "settings.providers",
+        to: "/settings/integrations",
+      },
+    ],
+  },
+  {
+    labelKey: "settings.administration",
     adminOnly: true,
     items: [
-      { id: "users", label: "Users", to: "/settings/admin/users" },
+      { id: "users", labelKey: "settings.users", to: "/settings/admin/users" },
       {
         id: "updatesLicense",
-        label: "Updates & license",
+        labelKey: "settings.updatesLicense",
         to: "/settings/admin/updates-license",
       },
     ],
   },
   {
-    label: "Data & backup",
+    labelKey: "settings.dataBackup",
     items: [
-      { id: "import", label: "Import", to: "/settings/data/import" },
-      { id: "export", label: "Export", to: "/settings/data/export" },
+      {
+        id: "import",
+        labelKey: "settings.import",
+        to: "/settings/data/import",
+      },
+      {
+        id: "export",
+        labelKey: "settings.export",
+        to: "/settings/data/export",
+      },
     ],
   },
   {
-    label: "Support",
+    labelKey: "settings.support",
     items: [
-      { id: "help", label: "Help & feedback", to: "/settings/support/help" },
-      { id: "about", label: "About", to: "/settings/support/about" },
+      {
+        id: "help",
+        labelKey: "settings.helpFeedback",
+        to: "/settings/support/help",
+      },
+      {
+        id: "about",
+        labelKey: "settings.about",
+        to: "/settings/support/about",
+      },
     ],
   },
 ];
